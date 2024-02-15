@@ -1,50 +1,95 @@
 import axios from 'axios';
 import * as jsYaml from 'js-yaml';
 import * as fs from "fs";
+import $RefParser from "@apidevtools/json-schema-ref-parser";
 
 import openapiSchemaToJsonSchema from 'openapi-schema-to-json-schema'
 
+interface JsonSchemaModel {
+    name?: string
+    description?: string
+    summary?: string
+    path?: string
+    method?: string
+    statusCode?: string
+    schema?: any
+}
+
 class OpenApiYAMLToJsonSchemaService {
+
+    extractRefValues(openAPI: any, statuses: string[]): JsonSchemaModel[] {
+        const models: JsonSchemaModel[] = [];
+
+        statuses.forEach((status) => {
+            this.extractRefValue(openAPI, status)
+                .forEach((refValue) => models.push(refValue));
+        });
+
+        return models;
+    }
+
+    extractSchema(obj: any, fieldName: string): any {
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                if (key === fieldName) {
+                    return obj[key];
+                } else if (typeof obj[key] === "object") {
+                    const result = this.extractSchema(obj[key], fieldName);
+                    if (result) {
+                        return result;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    extractRefValue(openAPI: any, status: string): JsonSchemaModel[] {
+        const result: JsonSchemaModel[] = [];
+        for (const [pathKey, pathItem] of Object.entries(openAPI.paths)) {
+            for (const [methodKey, method] of Object.entries(pathItem)) {
+                const response: any = method.responses[status];
+                let extractSchema = this.extractSchema(response.content, "schema");
+                if (extractSchema) {
+                    let jsonSchema: JsonSchemaModel = {
+                        name: method.operationId,
+                        summary: method.summary,
+                        description: method.description,
+                        statusCode: status,
+                        method: methodKey,
+                        path: pathKey,
+                        schema: extractSchema
+                    }
+                    result.push(jsonSchema);
+                }
+            }
+        }
+        return result;
+    }
 
     public async downloadOpenApiFileAndConvertToJsonSchema(url: string): Promise<void> {
         const yamlContent = await this.downloadYaml(url);
         const openApiSchema: any = await this.convertToOpenApiSchema(yamlContent);
 
-        const productName: string = this.getProductName(url)
         const openApiVersion: string = openApiSchema.info.version
 
-        console.log(`Converting OpenApi: ${productName} - Version: ${openApiVersion}`)
+        let schema = await $RefParser.dereference(openApiSchema);
 
-        const patternsToFilter = [
-            'ResponsePersonalCustomersIdentification',
-            'ResponsePersonalCustomersQualification',
-            'ResponsePersonalCustomersComplimentaryInformation',
-            'ResponseBusinessCustomersIdentification',
-            'ResponseBusinessCustomersQualification',
-            'ResponseBusinessCustomersComplimentaryInformation',
-            `ResponseInsurance${productName}`,
-            `ResponseInsurance${productName}PolicyInfo`,
-            `ResponseInsurance${productName}Premium`,
-            `ResponseInsurance${productName}Claims`,
-        ];
+        let jsonSchemaModels = this.extractRefValues(schema, ["200"]);
 
-        const filteredObjects = this.filterObjectsByPattern(openApiSchema.components.schemas, patternsToFilter);
+        console.log(`Converting OpenApi: ${openApiSchema.info.title} - Version: ${openApiVersion}`)
 
-        for (const key of Object.keys(filteredObjects)) {
-            const body = filteredObjects[key]
+        for (let jsonSchemaModel of jsonSchemaModels) {
+            const fileName = `${jsonSchemaModel.name}-${jsonSchemaModel.method}-${jsonSchemaModel.statusCode}-${openApiVersion}`;
             let jsonSchema = {
-                "type": body.type,
+                "type": "object",
                 "$schema": "http://json-schema.org/draft-04/schema#",
-                "required": body.required,
-                "properties": body.properties,
-                "components": {
-                    "schemas": openApiSchema.components.schemas
-                }
+                "required": jsonSchemaModel.schema.required,
+                "properties": jsonSchemaModel.schema.properties
             }
-            await this.saveToFile(JSON.stringify(jsonSchema, null, 2), `${key}-${openApiVersion}.json`);
+            await this.saveToFile(JSON.stringify(jsonSchema, null, 2), `${fileName}.json`);
         }
     }
-
 
     private async convertToOpenApiSchema(yamlContent: string): Promise<any> {
         const jsonContent = await jsYaml.load(yamlContent);
@@ -60,18 +105,6 @@ class OpenApiYAMLToJsonSchemaService {
         }
     }
 
-    private filterObjectsByPattern(obj: any, pattern: string[]): any {
-        const result: any = {};
-
-        Object.keys(obj).forEach((key) => {
-            if (pattern.includes(key)) {
-                result[key] = obj[key];
-            }
-        });
-
-        return result;
-    }
-
     private async saveToFile(content: string, fileName: string): Promise<void> {
         return new Promise((resolve, reject) => {
             fs.writeFile(fileName, content, 'utf-8', (err) => {
@@ -83,27 +116,6 @@ class OpenApiYAMLToJsonSchemaService {
                 }
             });
         });
-    }
-
-    public getProductName(url: string): string {
-        if (url.includes('customers')) {
-            return 'customers'
-        }
-        const match = url.match(/\/swagger\/insurance-([a-zA-Z-]+)\.yaml$/);
-        if (match && match[1]) {
-            const product = match[1];
-            console.log(`Value ${product} extracted from URL:`, product);
-            const productCamelCase = this.toCamelCase(product)
-            console.log(`Value ${product} converted to CamelCase:`, productCamelCase);
-            return productCamelCase;
-        } else {
-            console.error('Error on extracted product name by URL.');
-        }
-    }
-
-    toCamelCase(input: string): string {
-        const camelCased = input.replace(/-([a-z])/g, (_, match) => match.toUpperCase());
-        return camelCased.charAt(0).toUpperCase() + camelCased.slice(1);
     }
 }
 
