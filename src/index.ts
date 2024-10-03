@@ -1,6 +1,10 @@
 import express, {NextFunction, Request, Response} from "express";
 import processRouter from "./routes/OpenApiToJsonSchemaRouter";
 
+import dotenv from "dotenv";
+
+dotenv.config()
+
 const app = express();
 app.use(express.json());
 
@@ -15,6 +19,6 @@ app.use((err: Error, request: Request, response: Response, next: NextFunction) =
     }
 );
 
-app.listen(3003, () => {
-    console.log("Server is running. Port: 3003");
+app.listen(process.env.PORT, () => {
+    console.log("Server is running. Port: " + process.env.PORT);
 });
