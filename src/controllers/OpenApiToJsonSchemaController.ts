@@ -61,9 +61,12 @@ class OpenApiToJsonSchemaController {
                 console.log(`Start processing: ${openapiRequestModel}`)
 
                 validation.apiName = openapiRequestModel.paths[0]?.replace("/", "");
+                console.log("apiName: ", validation.apiName)
                 const schema = await OpenApiYAMLToJsonSchema.downloadOpenApiFileAndConvertToJsonSchemaAndGet(openapiRequestModel);
+                console.log("Schama: ", schema)
 
                 const responseService = await CallServicePhaseOne.callService(openapiRequestModel.urlCompare)
+                console.log("responseService: ", responseService)
 
                 const isDataValid = ajv.validate(schema, responseService);
 
