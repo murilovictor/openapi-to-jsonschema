@@ -116,6 +116,7 @@ class OpenApiYAMLToJsonSchemaService {
     }
 
     public async downloadOpenApiFileAndConvertToJsonSchemaAndGet(openapiRequestModel: OpenapiRequestModel): Promise<any> {
+        console.log('Chamou: downloadOpenApiFileAndConvertToJsonSchemaAndGet')
         const yamlContent = await this.downloadYaml(openapiRequestModel.url);
         console.log('yamlContent: ', yamlContent)
         const openApiSchema: any = await this.convertToOpenApiSchema(yamlContent);

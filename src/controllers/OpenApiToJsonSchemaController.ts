@@ -60,7 +60,7 @@ class OpenApiToJsonSchemaController {
             try {
                 console.log(`Start processing: ${JSON.stringify(openapiRequestModel)}`);
 
-                validation.apiName = openapiRequestModel.paths[0]?.replace("/", "");
+                validation.apiName = openapiRequestModel?.paths[0]?.replace("/", "");
                 console.log("apiName: ", validation.apiName)
                 const schema = await OpenApiYAMLToJsonSchema.downloadOpenApiFileAndConvertToJsonSchemaAndGet(openapiRequestModel);
                 console.log("Schama: ", schema)
