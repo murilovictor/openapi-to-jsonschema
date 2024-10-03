@@ -117,11 +117,15 @@ class OpenApiYAMLToJsonSchemaService {
 
     public async downloadOpenApiFileAndConvertToJsonSchemaAndGet(openapiRequestModel: OpenapiRequestModel): Promise<any> {
         const yamlContent = await this.downloadYaml(openapiRequestModel.url);
+        console.log('yamlContent: ', yamlContent)
         const openApiSchema: any = await this.convertToOpenApiSchema(yamlContent);
+        console.log('openApiSchema: ', openApiSchema)
 
         let schema = await $RefParser.dereference(openApiSchema);
+        console.log('schema: ', schema)
 
         let jsonSchemaModels = this.extractRefValues(schema, openapiRequestModel);
+        console.log('jsonSchemaModels: ', jsonSchemaModels)
 
         let jsonSchemaResponse = jsonSchemaModels[0];
 
