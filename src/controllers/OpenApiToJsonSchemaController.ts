@@ -10,6 +10,7 @@ import archiver from "archiver";
 
 class OpenApiToJsonSchemaController {
     async downloadOpenApiFileAndConvertToJsonSchema(req: Request, res: Response): Promise<void> {
+        ensureTempDirectoryExists('tmp');
         const zipPath = path.join('tmp', 'output.zip');
         const body = req.body as OpenapiRequestModel[];
 
