@@ -23,7 +23,7 @@ class OpenApiToJsonSchemaController {
 
     async compare(req: Request, res: Response): Promise<void> {
         const body = req.body as OpenapiRequestModel[];
-        const ajv = new Ajv({strictSchema: false});
+        const ajv = new Ajv({strictSchema: false, allErrors: true});
 
         let validations: ValidationItem[] = [];
 
@@ -39,7 +39,6 @@ class OpenApiToJsonSchemaController {
                 const responseService = await CallServicePhaseOne.callService(openapiRequestModel.urlCompare)
 
                 const isDataValid = ajv.validate(schema, responseService);
-
 
                 if (isDataValid) {
                     console.log("The ice cream data is valid! 🍨");
