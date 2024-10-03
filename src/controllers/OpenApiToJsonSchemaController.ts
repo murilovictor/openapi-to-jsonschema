@@ -58,7 +58,7 @@ class OpenApiToJsonSchemaController {
             const validation: ValidationItem = {};
 
             try {
-                console.log(`Start processing: ${openapiRequestModel}`)
+                console.log(`Start processing: ${JSON.stringify(openapiRequestModel)}`);
 
                 validation.apiName = openapiRequestModel.paths[0]?.replace("/", "");
                 console.log("apiName: ", validation.apiName)
