@@ -104,7 +104,7 @@ class OpenApiYAMLToJsonSchemaService {
         console.log(`Converting OpenApi: ${openApiSchema.info.title} - Version: ${openApiVersion}`)
 
         for (let jsonSchemaModel of jsonSchemaModels) {
-            const fileName = `temp/${jsonSchemaModel.name}-${jsonSchemaModel.method}-${jsonSchemaModel.statusCode}-${openApiVersion}.json`;
+            const fileName = `tmp/${jsonSchemaModel.name}-${jsonSchemaModel.method}-${jsonSchemaModel.statusCode}-${openApiVersion}.json`;
             let jsonSchema = {
                 "type": "object",
                 "$schema": "http://json-schema.org/draft-04/schema#",
