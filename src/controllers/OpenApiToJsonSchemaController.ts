@@ -25,10 +25,9 @@ class OpenApiToJsonSchemaController {
         }
 
         try {
+            ensureTempDirectoryExists('tmp');
             // Cria o arquivo ZIP
             await createZip(zipPath);
-            console.log("xip pah: ", zipPath)
-            console.log("xxxxx: ", process.cwd())
 
             // Define o cabeçalho de download
             res.setHeader('Content-Disposition', 'attachment; filename="output.zip"');
@@ -107,7 +106,7 @@ const createZip = (outputPath: string): Promise<void> => {
         archive.pipe(output);
 
         // Adiciona os arquivos ao ZIP (substitua pelos caminhos dos arquivos gerados)
-        const filesDir = path.join(process.cwd(), 'tmp'); // Usando process.cwd() para acessar a raiz do projeto
+        const filesDir = path.join('tmp'); // Usando process.cwd() para acessar a raiz do projeto
         const files = fs.readdirSync(filesDir);
 
         files.forEach(file => {
@@ -134,6 +133,12 @@ const clearTempDirectory = (tempDirPath: string): void => {
         console.log('Todos os arquivos no diretório "temp" foram excluídos.');
     } catch (error) {
         console.error('Erro ao limpar o diretório "temp":', error);
+    }
+};
+
+const ensureTempDirectoryExists = (dir: string): void => {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
     }
 };
 
