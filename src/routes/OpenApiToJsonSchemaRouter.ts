@@ -4,5 +4,6 @@ import OpenApiToJsonSchemaController from "../controllers/OpenApiToJsonSchemaCon
 const routerOpenApiToJsonSchema = express.Router();
 
 routerOpenApiToJsonSchema.post('/process', OpenApiToJsonSchemaController.downloadOpenApiFileAndConvertToJsonSchema);
+routerOpenApiToJsonSchema.post('/compare', OpenApiToJsonSchemaController.compare);
 
 export default routerOpenApiToJsonSchema;

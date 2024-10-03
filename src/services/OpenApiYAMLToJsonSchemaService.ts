@@ -115,6 +115,24 @@ class OpenApiYAMLToJsonSchemaService {
         }
     }
 
+    public async downloadOpenApiFileAndConvertToJsonSchemaAndGet(openapiRequestModel: OpenapiRequestModel): Promise<any> {
+        const yamlContent = await this.downloadYaml(openapiRequestModel.url);
+        const openApiSchema: any = await this.convertToOpenApiSchema(yamlContent);
+
+        let schema = await $RefParser.dereference(openApiSchema);
+
+        let jsonSchemaModels = this.extractRefValues(schema, openapiRequestModel);
+
+        let jsonSchemaResponse = jsonSchemaModels[0];
+
+        return {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "type": "object",
+            "required": jsonSchemaResponse.schema.required,
+            "properties": jsonSchemaResponse.schema.properties
+        };
+    }
+
     private async convertToOpenApiSchema(yamlContent: string): Promise<any> {
         const jsonContent = await jsYaml.load(yamlContent);
         return await openapiSchemaToJsonSchema(jsonContent)

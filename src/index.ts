@@ -4,7 +4,6 @@ import processRouter from "./routes/OpenApiToJsonSchemaRouter";
 const app = express();
 app.use(express.json());
 
-// Routes
 app.use('/api', processRouter);
 
 app.use((err: Error, request: Request, response: Response, next: NextFunction) => {
