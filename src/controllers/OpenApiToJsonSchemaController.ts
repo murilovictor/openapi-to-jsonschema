@@ -49,7 +49,7 @@ class OpenApiToJsonSchemaController {
         }
     }
 
-    async compare(req: Request, res: Response): Promise<void> {
+    async validateData(req: Request, res: Response): Promise<void> {
         const body = req.body as OpenapiRequestModel[];
         const ajv = new Ajv({strictSchema: false, allErrors: true});
 
