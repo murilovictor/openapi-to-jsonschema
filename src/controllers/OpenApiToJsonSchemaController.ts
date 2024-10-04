@@ -10,8 +10,8 @@ import archiver from "archiver";
 
 class OpenApiToJsonSchemaController {
     async downloadOpenApiFileAndConvertToJsonSchema(req: Request, res: Response): Promise<void> {
-        ensureTempDirectoryExists('tmp');
-        const zipPath = path.join('tmp', 'output.zip');
+        ensureTempDirectoryExists('/tmp');
+        const zipPath = path.join('/tmp', 'output.zip');
         const body = req.body as OpenapiRequestModel[];
 
 
@@ -26,7 +26,7 @@ class OpenApiToJsonSchemaController {
         }
 
         try {
-            ensureTempDirectoryExists('tmp');
+            ensureTempDirectoryExists('/tmp');
             // Cria o arquivo ZIP
             await createZip(zipPath);
 
@@ -40,7 +40,7 @@ class OpenApiToJsonSchemaController {
 
             // Após terminar o download, remove o arquivo ZIP
             zipStream.on('close', () => {
-                clearTempDirectory('tmp')
+                clearTempDirectory('/tmp')
             });
 
         } catch (error) {
@@ -110,7 +110,7 @@ const createZip = (outputPath: string): Promise<void> => {
         archive.pipe(output);
 
         // Adiciona os arquivos ao ZIP (substitua pelos caminhos dos arquivos gerados)
-        const filesDir = path.join('tmp'); // Usando process.cwd() para acessar a raiz do projeto
+        const filesDir = path.join('/tmp'); // Usando process.cwd() para acessar a raiz do projeto
         const files = fs.readdirSync(filesDir);
 
         files.forEach(file => {
