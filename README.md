@@ -18,10 +18,10 @@ Siga os passos abaixo para executar o projeto:
    npm run dev
 
 3. **Enviar Requisição cURL:** <br>
-   Utilize o cURL para enviar uma requisição POST ao endpoint /api/process. Certifique-se de fornecer o corpo da
+   Utilize o cURL para enviar uma requisição POST ao endpoint api/convert-and-download. Certifique-se de fornecer o corpo da
    requisição com a lista de URLs desejadas.
    ```bash
-   curl --location --request POST 'localhost:3000/api/process' \
+   curl --location --request POST 'localhost:3000/api/convert-and-download' \
    --header 'Content-Type: application/json' \
    --data '[
      {
@@ -36,7 +36,7 @@ Siga os passos abaixo para executar o projeto:
 
 | Propriedade | Descrição                                                                       |
 |-------------|---------------------------------------------------------------------------------|
-| `url`       | URL onde o arquivo YAML está localizado.                                        |
+| `url`       | URL onde o arquivo Openapi YAML está localizado.                                |
 | `paths`     | Paths que deseja extrair. Se for `null`, todos os paths serão considerados.     |
 | `methods`   | Métodos que deseja extrair. Se for `null`, todos os métodos serão considerados. |
 | `status`    | Status que deseja extrair. Se for `null`, todos os status serão considerados.   |
@@ -45,23 +45,16 @@ Exemplo de Request:
 
 ```json
 [
-  {
-    "url": "https://br-openinsurance.github.io/areadesenvolvedor/files/swagger/customers.yaml",
-    "paths": [
-      "/personal/identifications",
-      "/business/identifications"
-    ],
-    "methods": [
-      "get"
-    ],
-    "status": [
-      "200"
-    ]
-  }
+   {
+      "url": "https://raw.githubusercontent.com/br-openinsurance/areadesenvolvedor/main/documentation/source/files/swagger/data_channels.yaml",
+      "paths": ["/branches"],
+      "methods": ["get"],
+      "status": ["200"]
+   }
 ]
 ```
 
-5. **Os arquivos serão gerados no diretorio raiz do projeto**
+5. **Faça o donwload do arquivo zip**
 
 ## Informações de Contato <br>
 
