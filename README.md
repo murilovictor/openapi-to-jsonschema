@@ -24,12 +24,12 @@ Siga os passos abaixo para executar o projeto:
    curl --location --request POST 'localhost:3000/api/convert-and-download' \
    --header 'Content-Type: application/json' \
    --data '[
-     {
-        "url": "https://br-openinsurance.github.io/areadesenvolvedor/files/swagger/customers.yaml",
-        "paths": ["/personal/identifications", "/business/identifications"],
-        "methods": ["get"],
-        "status": ["200"]
-     }
+       {
+          "url": "https://raw.githubusercontent.com/br-openinsurance/areadesenvolvedor/main/documentation/source/files/swagger/data_channels.yaml",
+          "paths": ["/branches"],
+          "methods": ["get"],
+          "status": ["200"]
+       }
    ]'
 
 4. **Explicação do Request** <br>
