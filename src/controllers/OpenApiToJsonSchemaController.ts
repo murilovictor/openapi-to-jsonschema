@@ -9,6 +9,18 @@ import * as fs from "node:fs";
 import archiver from "archiver";
 
 class OpenApiToJsonSchemaController {
+
+    async convert(req: Request, res: Response): Promise<void> {
+        const body = req.body as OpenapiRequestModel;
+        try {
+            const data = await OpenApiYAMLToJsonSchema.downloadOpenApiFileAndConvertToJsonSchemaAndGet(body)
+            res.status(200).json(data);
+        } catch (error) {
+            console.error('Erro ao converter o arquivo:', error);
+            res.status(500).send('Erro ao converter o arquivo.');
+        }
+    }
+
     async downloadOpenApiFileAndConvertToJsonSchema(req: Request, res: Response): Promise<void> {
         ensureTempDirectoryExists('/tmp');
         const zipPath = path.join('/tmp', 'output.zip');
